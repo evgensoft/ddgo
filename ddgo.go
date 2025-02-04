@@ -13,7 +13,7 @@ import (
 type Result struct {
 	Title string
 	Info  string
-	Ref   string
+	URL   string
 }
 
 // Requests the query and puts the results into an array
