@@ -52,15 +52,7 @@ func Query(query string, maxResult int) ([]Result, error) {
 		ref := ""
 
 		if len(titleNode.Nodes) > 0 && len(titleNode.Nodes[0].Attr) > 2 {
-			ref, err = url.QueryUnescape(
-				strings.TrimPrefix(
-					titleNode.Nodes[0].Attr[2].Val,
-					"/l/?kh=-1&uddg=",
-				),
-			)
-			if err != nil {
-				return results, fmt.Errorf("QueryUnescape error: %w", err)
-			}
+			ref = getDDGUrl(titleNode.Nodes[0].Attr[2].Val)
 		}
 
 		results = append(results[:], Result{title, info, ref})
@@ -68,4 +60,18 @@ func Query(query string, maxResult int) ([]Result, error) {
 	}
 
 	return results, nil
+}
+
+func getDDGUrl(urlStr string) string {
+	trimmed := strings.TrimPrefix(urlStr, "//duckduckgo.com/l/?uddg=")
+	if idx := strings.Index(trimmed, "&rut="); idx != -1 {
+		decodedStr, err := url.PathUnescape(trimmed[:idx])
+		if err != nil {
+			return ""
+		}
+
+		return decodedStr
+	}
+
+	return ""
 }
