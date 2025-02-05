@@ -28,7 +28,7 @@ func Query(query string, maxResult int) ([]Result, error) {
 
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusAccepted {
 		return results, fmt.Errorf("status code error: %d %s", response.StatusCode, response.Status)
 	}
 
