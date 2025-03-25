@@ -9,6 +9,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// DefaultUserAgent defines a default value for user-agent header.
+const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+
 // Result holds the returned query data
 type Result struct {
 	Title string
@@ -19,9 +22,16 @@ type Result struct {
 // Requests the query and puts the results into an array
 func Query(query string, maxResult int) ([]Result, error) {
 	results := []Result{}
-	queryUrl := fmt.Sprintf("https://duckduckgo.com/html/?q=%s", url.QueryEscape(query))
+	queryUrl := fmt.Sprintf("https://html.duckduckgo.com/html/?q=%s", url.QueryEscape(query))
 
-	response, err := http.Get(queryUrl)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", queryUrl, nil)
+	if err != nil {
+		return results, fmt.Errorf("new request error: %w", err)
+	}
+	req.Header.Set("User-Agent", DefaultUserAgent)
+
+	response, err := client.Do(req)
 	if err != nil {
 		return results, fmt.Errorf("get %v error: %w", queryUrl, err)
 	}
