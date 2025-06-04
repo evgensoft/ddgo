@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"net"
 	"strings"
-
+	"time"
+	
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -21,10 +23,27 @@ type Result struct {
 
 // Requests the query and puts the results into an array
 func Query(query string, maxResult int) ([]Result, error) {
+	return QueryWithProxy(query, maxResult, "")
+}
+
+func QueryWithProxy(query string, maxResult int, proxyUrl string) ([]Result, error) {
 	results := []Result{}
 	queryUrl := fmt.Sprintf("https://html.duckduckgo.com/html/?q=%s", url.QueryEscape(query))
 
-	client := &http.Client{}
+	transport := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout: 30 * time.Second, // Устанавливаем таймаут в 30 секунд
+		}).DialContext,
+	}
+	if proxyUrl != "" {
+		proxy, err := url.Parse(proxyUrl)
+		if err != nil {
+			return results, fmt.Errorf("parse proxy url error: %w", err)
+		}
+		transport.Proxy = http.ProxyURL(proxy)
+	}
+
+	client := &http.Client{Transport: transport}
 	req, err := http.NewRequest("GET", queryUrl, nil)
 	if err != nil {
 		return results, fmt.Errorf("new request error: %w", err)
