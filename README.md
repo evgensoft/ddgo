@@ -34,7 +34,7 @@ func main() {
 	}
 
 	for _, result := range results {
-		fmt.Printf("Title: %s\nInfo: %s\nRef: %s\n\n", result.Title, result.Info, result.Ref)
+		fmt.Printf("Title: %s\nInfo: %s\nRef: %s\n\n", result.Title, result.Info, result.URL)
 	}
 }
 ```
@@ -58,7 +58,7 @@ The `Result` struct holds the data for each search result:
 
 - `Title` (string): The title of the search result.
 - `Info` (string): A snippet of information about the search result.
-- `Ref` (string): The URL of the search result.
+- `URL` (string): The URL of the search result.
 
 ## Error Handling
 
